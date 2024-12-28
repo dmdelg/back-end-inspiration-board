@@ -27,3 +27,13 @@ This file lists the dependencies we anticipate are needed for the project.
 ## `.gitignore`
 
 This is a hidden file which lists specific files and file extension types that should be ignored by the git repo when looking for changed files to stage.
+
+## DB init commands
+psql -U postgres postgres
+drop database inspiration_board_development;
+create database inspiration_board_development;
+\q
+rm -rf migrations
+flask db init
+flask db migrate -m "Recreate model migrations"
+flask db upgrade
