@@ -48,6 +48,32 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "delete board",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/boards/1",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"boards",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get board by id",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
 		}
 	],
 	"event": [

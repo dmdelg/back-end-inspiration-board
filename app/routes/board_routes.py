@@ -53,3 +53,38 @@ def get_all_boards():
         )
 
     return boards_response
+
+@bp.get("/<board_id>")
+def get_one_board(board_id):
+    board = validate_board(board_id)
+
+    return board.to_dict()
+
+@bp.delete("/<board_id>")
+def delete_board(board_id):
+    board = validate_board(board_id)
+    db.session.delete(board)
+    db.session.commit()
+
+    response = {
+        "details": f"Board {board_id} \"{board.title}\" successfully deleted"
+    }
+
+    return response, 200
+
+def validate_board(board_id):
+    try:
+        board_id = int(board_id)
+    except:
+        response = {"details": "Invalid data"}
+
+        abort(make_response(response , 400))
+
+    query = db.select(Board).where(Board.id == board_id)
+    board = db.session.scalar(query)
+    
+    if not board:
+        response = {"message": f"task {board_id} not found"}
+        abort(make_response(response, 404))
+
+    return board
