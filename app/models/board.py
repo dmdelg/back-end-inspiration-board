@@ -6,3 +6,18 @@ class Board(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     title: Mapped[str] = mapped_column(nullable=False)
     owner: Mapped[str] = mapped_column(nullable=False)
+
+    def to_dict(self):
+        return dict(
+            id=self.id,
+            title=self.title,
+            owner=self.owner
+        )
+    
+    # from JSON to model
+    @classmethod
+    def from_dict(cls, board_data):
+        return cls(
+            title=board_data["title"],
+            owner=board_data["owner"]
+        )
