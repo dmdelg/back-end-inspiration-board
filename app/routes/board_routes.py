@@ -84,7 +84,7 @@ def validate_board(board_id):
     board = db.session.scalar(query)
     
     if not board:
-        response = {"message": f"task {board_id} not found"}
+        response = {"message": f"board {board_id} not found"}
         abort(make_response(response, 404))
 
     return board
