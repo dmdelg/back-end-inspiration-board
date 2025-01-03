@@ -1,10 +1,11 @@
 from flask import Blueprint, request
 from ..db import db
-from app.models import Card, Board
+from app.models.card import Card
+from app.models.board import Board
 
-card_bp = Blueprint('cards', __name__, url_prefix='/cards')
+bp = Blueprint('cards', __name__, url_prefix='/cards')
 
-@card_bp.route('/', methods=['POST'])
+@bp.route('/', methods=['POST'])
 def create_card():
     data = request.get_json()
     message = data.get('message')
@@ -28,7 +29,7 @@ def create_card():
         "board_id": card.board_id
     }, 201
 
-@card_bp.route('/', methods=['GET'])
+@bp.route('/', methods=['GET'])
 def get_cards():
     board_id = request.args.get('board_id')
     if board_id:
