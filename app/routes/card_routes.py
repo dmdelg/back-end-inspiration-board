@@ -1,7 +1,12 @@
 from flask import Blueprint, request
 from ..db import db
+<<<<<<< HEAD
 from app.models.board import Board
 from app.models.card import Card
+=======
+from app.models.card import Card
+from app.models.board import Board
+>>>>>>> f37d71c42b1aa84d031447189c9d6d96a24428f9
 
 bp = Blueprint('cards', __name__, url_prefix='/cards')
 
