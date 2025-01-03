@@ -1,22 +1,27 @@
 from flask import Blueprint, request, Response, make_response, abort
-from ..db import db
-from app.models.board import Board
 from app.models.card import Card
+from app.models.board import Board
+from ..db import db
 
 bp = Blueprint('cards', __name__, url_prefix='/cards')
 
-@bp.route('/', methods=['POST'])
+@bp.post("")
 def create_card():
     data = request.get_json()
+
     message = data.get('message')
     board_id = data.get('board_id')
 
     if not message or not board_id:
-        return {"error": 'Both "message" and "board_id" are required'}, 400
+        response = {"error": 'Both "message" and "board_id" are required'}
+        return make_response(response, 400)
 
-    board = Board.query.get(board_id)
+    query = db.select(Board).where(Board.id == board_id)
+    board = db.session.scalar(query)
+
     if not board:
-        return {"error": "Board not found"}, 404
+        response = {"error": "Board not found"}
+        return make_response(response, 404)
 
     card = Card(message=message, likes=0, board_id=board_id)
     db.session.add(card)
@@ -29,15 +34,17 @@ def create_card():
         "board_id": card.board_id
     }, 201
 
-@bp.route('/', methods=['GET'])
+@bp.get("")
 def get_cards():
     board_id = request.args.get('board_id')
-    if board_id:
-        cards = Card.query.filter_by(board_id=board_id).all()
-    else:
-        cards = Card.query.all()
+    query = db.select(Card)
 
-    return [
+    if board_id:
+        query = query.where(Card.board_id == board_id)
+
+    cards = db.session.scalars(query)
+
+    cards_response = [
         {
             "id": card.id,
             "message": card.message,
@@ -45,7 +52,20 @@ def get_cards():
             "board_id": card.board_id
         }
         for card in cards
-    ], 200
+    ]
+
+    return cards_response, 200
+
+@bp.get("/<card_id>")
+def get_one_card(card_id):
+    card = validate_card(card_id)
+
+    return {
+        "id": card.id,
+        "message": card.message,
+        "likes": card.likes,
+        "board_id": card.board_id
+    }, 200
 
 @bp.delete("/<card_id>")
 def delete_card(card_id):
@@ -54,7 +74,7 @@ def delete_card(card_id):
     db.session.commit()
 
     response = {
-        "details": f"Card {card_id} \"{card.title}\" successfully deleted"
+        "details": f"Card {card_id} \"{card.message}\" successfully deleted"
     }
 
     return response, 200
@@ -62,16 +82,15 @@ def delete_card(card_id):
 def validate_card(card_id):
     try:
         card_id = int(card_id)
-    except:
+    except ValueError:
         response = {"details": "Invalid data"}
-
-        abort(make_response(response , 400))
+        abort(make_response(response, 400))
 
     query = db.select(Card).where(Card.id == card_id)
     card = db.session.scalar(query)
     
     if not card:
-        response = {"message": f"task {card_id} not found"}
+        response = {"message": f"Card {card_id} not found"}
         abort(make_response(response, 404))
 
     return card
