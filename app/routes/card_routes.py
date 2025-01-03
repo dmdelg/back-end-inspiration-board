@@ -1,4 +1,4 @@
-from flask import Blueprint, request
+from flask import Blueprint, request, Response, make_response, abort
 from ..db import db
 from app.models.board import Board
 from app.models.card import Card
@@ -47,7 +47,34 @@ def get_cards():
         for card in cards
     ], 200
 
+@bp.delete("/<card_id>")
+def delete_card(card_id):
+    card = validate_card(card_id)
+    db.session.delete(card)
+    db.session.commit()
 
+    response = {
+        "details": f"Card {card_id} \"{card.title}\" successfully deleted"
+    }
+
+    return response, 200
+
+def validate_card(card_id):
+    try:
+        card_id = int(card_id)
+    except:
+        response = {"details": "Invalid data"}
+
+        abort(make_response(response , 400))
+
+    query = db.select(Card).where(Card.id == card_id)
+    card = db.session.scalar(query)
+    
+    if not card:
+        response = {"message": f"task {card_id} not found"}
+        abort(make_response(response, 404))
+
+    return card
 
 
 
