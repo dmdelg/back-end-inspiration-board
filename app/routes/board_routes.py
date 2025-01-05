@@ -2,7 +2,6 @@ from flask import Blueprint, request, Response, make_response, abort
 from app.models.board import Board
 from ..db import db
 
-
 bp = Blueprint("board_bp", __name__, url_prefix="/boards")
 
 @bp.post("")
@@ -72,6 +71,7 @@ def delete_board(board_id):
 
     return response, 200
 
+
 def validate_board(board_id):
     try:
         board_id = int(board_id)
@@ -84,7 +84,7 @@ def validate_board(board_id):
     board = db.session.scalar(query)
     
     if not board:
-        response = {"message": f"board {board_id} not found"}
+        response = {"message": f"Board {board_id} not found"}
         abort(make_response(response, 404))
 
     return board

@@ -32,6 +32,8 @@ This is a hidden file which lists specific files and file extension types that s
 psql -U postgres postgres
 drop database inspiration_board_development;
 create database inspiration_board_development;
+drop database inspiration_board_test;
+create database inspiration_board_test;
 \q
 rm -rf migrations
 flask db init
