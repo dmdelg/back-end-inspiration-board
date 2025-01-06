@@ -26,18 +26,6 @@ def create_board():
 @bp.get("")
 def get_all_boards():
     query = db.select(Board)
-
-    title_param = request.args.get("title")
-    if title_param:
-        query = query.where(Board.title.ilike(f"%{title_param}%"))
-
-    sort_param = request.args.get("sort")
-    if sort_param:
-        if sort_param == "asc":
-            query = query.order_by(Board.title.asc())
-        elif sort_param == "desc":
-            query = query.order_by(Board.title.desc())
-
     query = query.order_by(Board.id)
     boards = db.session.scalars(query)
 
@@ -62,11 +50,36 @@ def get_one_board(board_id):
 @bp.delete("/<board_id>")
 def delete_board(board_id):
     board = validate_board(board_id)
+    
+    for card in board.cards:
+        db.session.delete(card)
+
     db.session.delete(board)
     db.session.commit()
 
     response = {
         "details": f"Board {board_id} \"{board.title}\" successfully deleted"
+    }
+
+    return response, 200
+
+
+@bp.delete("")
+def delete_all_boards():
+    query = db.select(Board)
+    boards = db.session.scalars(query)
+
+    for board in boards:
+
+        for card in board.cards:
+            db.session.delete(card)
+
+        db.session.delete(board)
+    
+    db.session.commit()
+
+    response = {
+        "details": f"All boards deleted successfully"
     }
 
     return response, 200
