@@ -79,6 +79,21 @@ def delete_card(card_id):
 
     return response, 200
 
+@bp.put("/<card_id>/like")
+def update_card_like(card_id):
+    card = validate_card(card_id)
+
+    # Increment the likes count
+    card.likes += 1
+    db.session.commit()
+
+    return {
+        "id": card.id,
+        "message": card.message,
+        "likes": card.likes,
+        "board_id": card.board_id
+    }, 200
+
 def validate_card(card_id):
     try:
         card_id = int(card_id)
@@ -94,6 +109,3 @@ def validate_card(card_id):
         abort(make_response(response, 404))
 
     return card
-
-
-
