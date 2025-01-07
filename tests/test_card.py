@@ -4,11 +4,11 @@ def test_create_card(client, one_board):
     # Act
     response = client.post("/cards", json={
         "message": "New Card for Board",
-        "board_id": one_board.id
+        "board_id": one_board.id 
     })
     response_body = response.get_json()
 
-    # Assert
+    #Assert
     assert response.status_code == 201
     assert response_body["message"] == "New Card for Board"
     assert response_body["board_id"] == one_board.id
