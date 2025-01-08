@@ -71,7 +71,7 @@ def delete_card(card_id):
         "details": f'Card {card_id} "{card.message}" successfully deleted'
     }, 200
 
-@bp.put("/<card_id>/like")
+@bp.patch("/<card_id>/like")
 def update_card_like(card_id):
     card = validate_card(card_id)
 
