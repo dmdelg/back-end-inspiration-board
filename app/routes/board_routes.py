@@ -1,5 +1,6 @@
 from flask import Blueprint, request, Response, make_response, abort
 from app.models.board import Board
+from app.models.card import Card
 from ..db import db
 
 bp = Blueprint("board_bp", __name__, url_prefix="/boards")
@@ -84,6 +85,43 @@ def delete_all_boards():
 
     return response, 200
 
+
+@bp.post("/<board_id>/cards")
+def create_card_to_board(board_id):
+    board = validate_board(board_id)
+    
+    request_body = request.get_json()
+    message = request_body["message"]
+    if "message" not in request_body:
+        request_body = {"details": "Card message is required"}
+        return make_response(response_body, 400)
+
+    new_card = Card(message=message, board=board)
+    db.session.add(new_card)
+    db.session.commit()
+    
+    response_body = new_card.to_dict()
+    
+    return response_body, 201
+
+
+@bp.get("/<board_id>/cards")
+def get_cards_for_board(board_id):
+    board = validate_board(board_id)
+    cards = db.session.query(Card).filter_by(board_id=board.id).order_by(Card.id).all()
+
+    cards_response = []
+    for card in cards:
+        cards_response.append(
+            {
+                "id": card.id,
+                "message": card.message,
+                "board_id": card.board_id,
+            }
+        )
+
+    return cards_response
+    
 
 def validate_board(board_id):
     try:

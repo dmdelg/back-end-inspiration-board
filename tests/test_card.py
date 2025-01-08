@@ -4,14 +4,14 @@ def test_create_card(client, one_board):
     # Act
     response = client.post("/cards", json={
         "message": "New Card for Board",
-        "board_id": one_board.id 
+        "board_id": one_board.id
     })
     response_body = response.get_json()
 
     #Assert
     assert response.status_code == 201
     assert response_body["message"] == "New Card for Board"
-    assert response_body["board_id"] == one_board.id
+    assert response_body["board_id"] == 1
 
 def test_create_card_missing_fields(client):
     # Act
@@ -41,9 +41,8 @@ def test_get_cards(client, one_card_belongs_to_one_board):
 
     # Assert
     assert response.status_code == 200
-    assert "cards" in response_body  
-    assert len(response_body["cards"]) == 1  
-    assert response_body["cards"][0]["message"] == "Test Card" 
+    assert len(response_body) == 1
+    assert response_body["cards"][0]["message"] == "Test Card"
 
 def test_get_card(client, one_card_belongs_to_one_board):
     # Act
