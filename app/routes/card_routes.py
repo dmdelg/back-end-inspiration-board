@@ -22,7 +22,11 @@ def create_card():
     db.session.add(card)
     db.session.commit()
 
-    return {"message": card.message, "board_id": card.board_id}, 201
+    return {
+        "id": card.id,
+        "message": card.message,
+        "board_id": card.board_id
+    }, 201
 
 @bp.get("")
 def get_cards():
@@ -44,7 +48,6 @@ def get_cards():
         for card in cards
     ]
 
-    # Return a dictionary for consistency
     return {"cards": cards_response}, 200
 
 @bp.get("/<card_id>")
@@ -74,16 +77,24 @@ def delete_card(card_id):
 @bp.patch("/<card_id>/like")
 def update_card_like(card_id):
     card = validate_card(card_id)
+    if card is None:
+        return {"message": f"Card {card_id} not found"}, 404
 
-    # Increment the likes count
     card.likes += 1
     db.session.commit()
 
+    board = db.session.query(Board).get(card.board_id)
+    
+    if not board:
+        return {"message": "Board not found"}, 404
+
     return {
-        "id": card.id,
-        "message": card.message,
-        "likes": card.likes,
-        "board_id": card.board_id
+        "card": {
+            "id": card.id,
+            "message": card.message,
+            "likes": card.likes,
+            "board_id": board.id
+        }
     }, 200
 
 def validate_card(card_id):
@@ -91,11 +102,11 @@ def validate_card(card_id):
         card_id = int(card_id)
     except ValueError:
         response = {"error": "Invalid card ID"}
-        abort(make_response(response, 400)) 
+        abort(make_response(response, 400))
 
-    card = Card.query.get(card_id)
+    card = db.session.get(Card, card_id)
     if not card:
-        response = {"error": f"Card {card_id} not found"}
+        response = {"message": f"Card {card_id} not found"}
         abort(make_response(response, 404))
 
     return card

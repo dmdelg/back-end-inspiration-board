@@ -1,4 +1,7 @@
 import pytest
+from app.models.board import Board
+from app.models.card import Card
+from app.db import db
 
 def test_create_card(client, one_board):
     # Act
@@ -76,3 +79,34 @@ def test_delete_card(client, one_card_belongs_to_one_board):
     assert response.status_code == 404
     response_body = response.get_json()
     assert response_body["message"] == f"Card {one_card_belongs_to_one_board.id} not found"
+
+def test_update_card_like_success(client, app, one_board):
+    new_card = {
+        "message": "Test card",
+        "likes": 0,
+        "board_id": one_board.id,
+    }
+    response = client.post("/cards", json=new_card)
+    assert response.status_code == 201
+    response_body = response.get_json()
+    card_id = response_body["id"]
+
+    response = client.patch(f"/cards/{card_id}/like")
+    response_body = response.get_json()
+
+    assert response.status_code == 200
+    assert response_body["card"]["id"] == card_id
+    assert response_body["card"]["likes"] == 1
+
+    with app.app_context():
+        updated_card = Card.query.get(card_id)
+        assert updated_card is not None
+        assert updated_card.likes == 1
+
+def test_update_card_like_not_found(client):
+    # Act:
+    response = client.patch("/cards/1/like")
+    # Assert:
+    assert response.status_code == 404
+    response_body = response.get_json()
+    assert response_body["message"] == "Card 1 not found"
