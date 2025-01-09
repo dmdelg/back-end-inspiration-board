@@ -1,8 +1,8 @@
-"""Recreate model migrations
+"""Initial migration
 
-Revision ID: 700b498aff73
+Revision ID: 6157ffd7a892
 Revises: 
-Create Date: 2024-12-27 20:25:44.051312
+Create Date: 2025-01-09 00:23:26.187141
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '700b498aff73'
+revision = '6157ffd7a892'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -28,6 +28,8 @@ def upgrade():
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('message', sa.String(), nullable=False),
     sa.Column('likes', sa.Integer(), nullable=False),
+    sa.Column('board_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['board_id'], ['board.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###
