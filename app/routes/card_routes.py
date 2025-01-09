@@ -48,7 +48,7 @@ def get_cards():
         for card in cards
     ]
 
-    return {"cards": cards_response}, 200
+    return cards_response, 200
 
 @bp.get("/<card_id>")
 def get_card(card_id):

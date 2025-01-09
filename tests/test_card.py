@@ -45,7 +45,7 @@ def test_get_cards(client, one_card_belongs_to_one_board):
     # Assert
     assert response.status_code == 200
     assert len(response_body) == 1
-    assert response_body["cards"][0]["message"] == "Test Card"
+    assert response_body[0]["message"] == "Test Card"
 
 def test_get_card(client, one_card_belongs_to_one_board):
     # Act
