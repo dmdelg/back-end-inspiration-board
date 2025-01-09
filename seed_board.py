@@ -1,6 +1,9 @@
 # seed_board.py
 from app import create_app, db
 from app.models.board import Board
+from dotenv import load_dotenv
+
+load_dotenv()
 
 my_app = create_app()
 with my_app.app_context():
